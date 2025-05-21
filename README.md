@@ -44,6 +44,33 @@ The data was collected using a Python web scraper that:
 
 The scraper respects website rate limits and employs polite scraping practices.
 
+## Dataset Enhancement with LLMs
+
+This dataset is enhanced using large language models (LLMs) to provide additional high-quality content:
+
+- **Generated Content**: Additional examples that complement the scraped data
+- **Multi-turn Conversations**: Synthetic chat examples about Sheikh Mujibur Rahman
+- **Instruction Examples**: Task-specific examples in the Alpaca format
+- **Pretraining Text**: Additional Bangla text for continued pretraining
+
+The enhancement process uses:
+
+1. **Gemini API**: Google Gemini 1.5 Pro for generating comprehensive Bangla content
+2. **GROQ API**: Alternative to use Llama 3 for content generation
+
+To customize the enhancement process:
+
+```bash
+# Basic usage with default settings (10 examples per dataset type)
+python enhance_dataset_with_llm.py
+
+# Specify model and number of examples
+python enhance_dataset_with_llm.py --model gemini --examples 5
+
+# Generate only for specific dataset type
+python enhance_dataset_with_llm.py --dataset-type chat --model groq
+```
+
 ## Potential Uses
 
 - Training Bangla language models on historical and political text

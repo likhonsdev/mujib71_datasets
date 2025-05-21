@@ -29,7 +29,25 @@ if %ERRORLEVEL% NEQ 0 (
 )
 echo.
 
-echo Step 4: Uploading datasets to Hugging Face...
+echo Step 4: Creating LLM dataset...
+python create_llm_dataset.py
+if %ERRORLEVEL% NEQ 0 (
+    echo Error running create_llm_dataset.py
+    pause
+    exit /b 1
+)
+echo.
+
+echo Step 5: Enhancing datasets using LLM API...
+python enhance_dataset_with_llm.py --model gemini --examples 5
+if %ERRORLEVEL% NEQ 0 (
+    echo Error running enhance_dataset_with_llm.py
+    pause
+    exit /b 1
+)
+echo.
+
+echo Step 6: Uploading datasets to Hugging Face...
 python upload_to_huggingface.py
 if %ERRORLEVEL% NEQ 0 (
     echo Error running upload_to_huggingface.py
