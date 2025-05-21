@@ -1,0 +1,80 @@
+# LLM Dataset Enhancement Configuration
+
+# API Configuration
+apis:
+  groq:
+    enabled: true
+    model: "llama3-8b-8192"
+    temperature: 0.7
+    max_tokens: 2048
+  gemini:
+    enabled: true
+    model: "gemini-1.5-pro"
+    temperature: 0.8
+    max_tokens: 2048
+  cohere:
+    enabled: true
+    model: "command-r"
+    temperature: 0.75
+    max_tokens: 2048
+  together:
+    enabled: true
+    model: "meta-llama-3-8b"
+    temperature: 0.7
+    max_tokens: 2048
+
+# Dataset Generation Settings
+generation:
+  chat:
+    examples: 10
+    turns_min: 3
+    turns_max: 5
+    system_message_enabled: true
+  instruct:
+    examples: 10
+    output_length_min: 100
+    output_length_max: 500
+  pretrain:
+    paragraphs: 10
+    paragraph_min: 3
+    paragraph_max: 5
+
+# Prompt Engineering Techniques
+prompt_engineering:
+  use_examples: true
+  use_step_by_step: true
+  use_structured_output: true
+  use_bangla_context: true
+  add_factual_constraints: true
+  temperature_variation: true
+
+# Topics (add more specific topics here)
+topics:
+  - "Early life of Sheikh Mujibur Rahman"
+  - "Sheikh Mujibur Rahman's education"
+  - "Political career of Sheikh Mujibur Rahman"
+  - "Sheikh Mujibur Rahman's role in the Language Movement"
+  - "The Six-Point Movement"
+  - "Sheikh Mujibur Rahman's imprisonment"
+  - "7th March Speech of Sheikh Mujibur Rahman"
+  - "Sheikh Mujibur Rahman during the Liberation War"
+  - "Sheikh Mujibur Rahman's return to Bangladesh after independence"
+  - "Sheikh Mujibur Rahman's economic policies"
+  - "Foreign policy of Sheikh Mujibur Rahman"
+  - "Sheikh Mujibur Rahman's assassination"
+  - "Legacy of Sheikh Mujibur Rahman"
+  - "Sheikh Mujibur Rahman's family"
+  - "Historical significance of Sheikh Mujibur Rahman"
+  - "Cultural impact of Sheikh Mujibur Rahman"
+  - "Sheikh Mujibur Rahman's vision for Bangladesh"
+  - "Bangabandhu: The Friend of Bengal"
+  - "Sheikh Mujibur Rahman's speeches and writings"
+  - "International recognition of Sheikh Mujibur Rahman"
+
+# Advanced Settings
+advanced:
+  parallel_workers: 3
+  retry_attempts: 3
+  retry_delay_base: 2
+  max_context_length: 4096
+  save_failed_attempts: false

@@ -39,7 +39,10 @@ if %ERRORLEVEL% NEQ 0 (
 echo.
 
 echo Step 5: Enhancing datasets using LLM API...
-python enhance_dataset_with_llm.py --model gemini --examples 5
+python enhance_dataset_with_llm.py --model groq --examples 5
+
+echo Step 5b: Advanced datasets enhancement tool prepared...
+python advanced_enhance_dataset.py
 if %ERRORLEVEL% NEQ 0 (
     echo Error running enhance_dataset_with_llm.py
     pause

@@ -53,12 +53,14 @@ This dataset is enhanced using large language models (LLMs) to provide additiona
 - **Instruction Examples**: Task-specific examples in the Alpaca format
 - **Pretraining Text**: Additional Bangla text for continued pretraining
 
-The enhancement process uses:
+### Basic Enhancement
+
+The basic enhancement process uses:
 
 1. **Gemini API**: Google Gemini 1.5 Pro for generating comprehensive Bangla content
 2. **GROQ API**: Alternative to use Llama 3 for content generation
 
-To customize the enhancement process:
+To customize the basic enhancement process:
 
 ```bash
 # Basic usage with default settings (10 examples per dataset type)
@@ -70,6 +72,42 @@ python enhance_dataset_with_llm.py --model gemini --examples 5
 # Generate only for specific dataset type
 python enhance_dataset_with_llm.py --dataset-type chat --model groq
 ```
+
+### Advanced Enhancement
+
+For advanced control over the dataset enhancement process, a YAML configuration-based approach is available:
+
+- **Multiple LLM Support**: Includes Gemini, GROQ, Cohere, and Together.ai
+- **Prompt Engineering**: Configurable techniques for generating better results
+- **Centralized Configuration**: Control all aspects through a YAML file
+
+The advanced enhancement uses:
+
+1. **YAML Configuration**: Central control through `dataset/llm_config.yml`
+2. **Advanced Prompt Engineering**: Techniques to improve generation quality
+3. **Multiple LLM APIs**: Support for 4 different LLM providers
+4. **Error Handling**: Improved retry logic and failure recovery
+
+To use the advanced enhancement:
+
+```bash
+# First ensure you have the additional requirements installed
+pip install pyyaml cohere together
+
+# Basic usage with configuration
+python advanced_enhance_dataset.py
+
+# Specify model and override config settings
+python advanced_enhance_dataset.py --model cohere --examples 3
+```
+
+The `dataset/llm_config.yml` file allows configuration of:
+
+- API settings (models, temperatures, token limits)
+- Generation parameters (examples, conversation turns, lengths)
+- Prompt engineering techniques
+- Topic selection and control
+- Advanced settings (parallelism, retries, error handling)
 
 ## Potential Uses
 

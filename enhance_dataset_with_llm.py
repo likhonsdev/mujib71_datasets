@@ -8,6 +8,8 @@ from concurrent.futures import ThreadPoolExecutor
 # Load API keys from environment or set them if provided
 GROQ_API_KEY = os.environ.get("GROQ_API_KEY", "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")
 GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY", "AIzaSyBFhERyEMxIWk_hsWOKU-Vs0stwocn0h0g")
+COHERE_API_KEY = os.environ.get("COHERE_API_KEY", "")
+TOGETHER_API_KEY = os.environ.get("TOGETHER_API_KEY", "")
 
 def setup_argument_parser():
     """Setup command-line arguments"""
@@ -364,6 +366,7 @@ def save_enhanced_datasets(datasets, new_content):
     os.makedirs("dataset/task_specific/llm/instruct", exist_ok=True)
     os.makedirs("dataset/task_specific/llm/chat", exist_ok=True)
     os.makedirs("dataset/task_specific/llm/pretrain", exist_ok=True)
+    os.makedirs("dataset/task_specific/chat", exist_ok=True)
     
     # Save chat dataset
     if "chat" in new_content and new_content["chat"]:
