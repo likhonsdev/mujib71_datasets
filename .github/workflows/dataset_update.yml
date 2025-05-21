@@ -1,0 +1,72 @@
+name: Update and Upload Datasets
+
+on:
+  # Run on pushes to the main branch
+  push:
+    branches: [ main ]
+  
+  # Run on a schedule (daily at 02:00 UTC)
+  schedule:
+    - cron: '0 2 * * *'
+  
+  # Allow manual triggering
+  workflow_dispatch:
+
+jobs:
+  update-dataset:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.10'
+        cache: 'pip'
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+    
+    - name: Create requirements.txt if not exists
+      run: |
+        if [ ! -f requirements.txt ]; then
+          echo "requests==2.31.0" > requirements.txt
+          echo "beautifulsoup4==4.12.2" >> requirements.txt
+          echo "pandas==2.0.3" >> requirements.txt
+          echo "huggingface-hub==0.19.3" >> requirements.txt
+        fi
+    
+    - name: Run web scraper
+      run: python scraper.py
+    
+    - name: Download images
+      run: python download_image.py
+    
+    - name: Create HuggingFace Chat dataset
+      run: python create_chat_dataset.py
+    
+    - name: Login to Hugging Face
+      env:
+        HF_TOKEN: ${{ secrets.HUGGINGFACE_TOKEN }}
+      run: |
+        pip install huggingface_hub
+        python -c "from huggingface_hub import HfApi; HfApi().set_access_token('${{ secrets.HUGGINGFACE_TOKEN }}')"
+    
+    - name: Upload datasets to Hugging Face
+      env:
+        HF_TOKEN: ${{ secrets.HUGGINGFACE_TOKEN }}
+      run: python upload_to_huggingface.py
+    
+    - name: Update README badges
+      run: |
+        sed -i 's|<!-- Dataset Update: .*-->|<!-- Dataset Update: '"$(date '+%Y-%m-%d')"' -->|g' README.md
+    
+    - name: Commit and push updated README
+      uses: stefanzweifel/git-auto-commit-action@v4
+      with:
+        commit_message: "Update dataset timestamp [skip ci]"
+        file_pattern: README.md

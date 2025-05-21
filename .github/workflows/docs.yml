@@ -1,0 +1,262 @@
+name: Documentation
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'README.md'
+      - 'docs/**'
+  
+  # Allow manual triggering
+  workflow_dispatch:
+
+jobs:
+  deploy-docs:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.10'
+    
+    - name: Install MkDocs
+      run: |
+        python -m pip install --upgrade pip
+        pip install mkdocs mkdocs-material
+    
+    - name: Create docs directory if not exists
+      run: mkdir -p docs
+    
+    - name: Copy README to index
+      run: |
+        if [ ! -f docs/index.md ]; then
+          cp README.md docs/index.md
+        fi
+    
+    - name: Create MkDocs config if not exists
+      run: |
+        if [ ! -f mkdocs.yml ]; then
+          cat > mkdocs.yml << EOF
+        site_name: Sheikh Mujibur Rahman Dataset
+        site_description: Documentation for Sheikh Mujibur Rahman Bangla NLP Dataset
+        site_author: Likhon Sheikh
+        repo_url: https://github.com/likhonsheikh/mujib71
+        theme:
+          name: material
+          palette:
+            primary: green
+            accent: light green
+          features:
+            - navigation.tabs
+            - navigation.sections
+            - navigation.top
+        nav:
+          - Home: index.md
+          - Chat Dataset Format: chat-format.md
+          - Data Sources: data-sources.md
+          - Usage Examples: usage-examples.md
+        markdown_extensions:
+          - pymdownx.highlight
+          - pymdownx.superfences
+          - pymdownx.tabbed
+          - pymdownx.critic
+        EOF
+        fi
+    
+    # Create additional documentation pages
+    - name: Create Chat Format documentation
+      run: |
+        if [ ! -f docs/chat-format.md ]; then
+          cat > docs/chat-format.md << EOF
+        # HuggingFace Chat Dataset Format
+
+        The chat dataset follows the HuggingFace Chat format specification.
+
+        ## Format Requirements
+
+        - Each example is a JSON object with a "messages" array.
+        - The messages array contains at least one "User" and one "Chatbot" object.
+        - There is an optional "System" role.
+
+        ## Example Format
+
+        Here's an example of a chat dataset entry:
+
+        \`\`\`json
+        {
+          "messages": [
+            {"role": "System", "content": "You are a helpful AI assistant with expertise in Bangladeshi history."},
+            {"role": "User", "content": "Tell me about Sheikh Mujibur Rahman."},
+            {"role": "Chatbot", "content": "Sheikh Mujibur Rahman (1920-1975) was the founding father of Bangladesh..."}
+          ]
+        }
+        \`\`\`
+
+        ## Dataset Splits
+
+        The dataset is distributed with both training and validation splits:
+        
+        - Training split: Located in \`train.jsonl\`
+        - Validation split: Located in \`validation.jsonl\`
+        
+        ## Usage in Model Training
+
+        This format is compatible with various chat-based language model fine-tuning pipelines, including:
+        
+        - OpenAI fine-tuning
+        - Hugging Face TRL (Transformer Reinforcement Learning)
+        - PEFT (Parameter-Efficient Fine-Tuning) methods
+        EOF
+        fi
+    
+    - name: Create Data Sources documentation
+      run: |
+        if [ ! -f docs/data-sources.md ]; then
+          cat > docs/data-sources.md << EOF
+        # Data Sources
+
+        ## Primary Sources
+
+        The Sheikh Mujibur Rahman Bangla NLP Dataset is collected from two primary sources:
+
+        ### 1. Prothom Alo
+
+        [Prothom Alo](https://www.prothomalo.com) is one of Bangladesh's leading Bangla newspapers. Articles are collected using the following criteria:
+
+        - Contains references to "Sheikh Mujibur Rahman" or "Bangabandhu"
+        - Includes substantive content about his life, legacy, or historical impact
+        - Represents diverse perspectives on his contributions to Bangladesh
+
+        ### 2. Bangla Wikipedia
+
+        The [Bangla Wikipedia page on Sheikh Mujibur Rahman](https://bn.wikipedia.org/wiki/শেখ_মুজিবুর_রহমান) provides structured information including:
+
+        - Biographical details
+        - Political career
+        - Role in the independence movement
+        - Governance and policies
+        - Legacy and impact
+
+        ## Data Collection Process
+
+        The data collection process follows these steps:
+
+        1. Web scraping with polite practices (respecting rate limits)
+        2. Content filtering to ensure relevance
+        3. Text cleaning and normalization
+        4. Structured formatting as JSON and CSV
+        5. Creation of conversation pairs for the chat dataset
+
+        ## Data Quality
+
+        Each entry in the dataset undergoes quality checks for:
+
+        - Relevance to Sheikh Mujibur Rahman
+        - Factual accuracy (based on source reliability)
+        - Completeness of information
+        - Proper citation of sources
+        EOF
+        fi
+    
+    - name: Create Usage Examples documentation
+      run: |
+        if [ ! -f docs/usage-examples.md ]; then
+          cat > docs/usage-examples.md << EOF
+        # Usage Examples
+
+        ## Loading the Dataset
+
+        ```python
+        from datasets import load_dataset
+
+        # Load the main dataset
+        dataset = load_dataset("likhonsheikhdev/mujib71")
+
+        # Load the chat dataset
+        chat_dataset = load_dataset("likhonsheikhdev/mujib71-chat")
+        ```
+
+        ## Text Classification
+
+        ```python
+        import pandas as pd
+        import torch
+        from transformers import BertTokenizer, BertForSequenceClassification
+
+        # Load the dataset and convert to DataFrame
+        df = pd.DataFrame(dataset["news_articles"])
+        
+        # Example classification task: Categorizing articles by topic
+        topics = ["biography", "politics", "legacy", "family", "historical"]
+        
+        # Preprocessing function
+        def preprocess_for_bert(text, max_len=512):
+            tokenizer = BertTokenizer.from_pretrained('bert-base-multilingual-cased')
+            encoded = tokenizer.encode_plus(
+                text,
+                add_special_tokens=True,
+                max_length=max_len,
+                padding='max_length',
+                truncation=True,
+                return_attention_mask=True,
+                return_tensors='pt'
+            )
+            return encoded
+        ```
+
+        ## Fine-tuning LLM with Chat Dataset
+
+        ```python
+        from transformers import AutoModelForCausalLM, AutoTokenizer, TrainingArguments
+        from trl import SFTTrainer
+        from datasets import load_dataset
+
+        # Load the chat dataset
+        dataset = load_dataset("likhonsheikhdev/mujib71-chat")
+
+        # Load model and tokenizer
+        model_name = "mistralai/Mistral-7B-v0.1"  # Or any other base model
+        model = AutoModelForCausalLM.from_pretrained(model_name)
+        tokenizer = AutoTokenizer.from_pretrained(model_name)
+
+        # Set up training arguments
+        training_args = TrainingArguments(
+            output_dir="./results",
+            per_device_train_batch_size=4,
+            gradient_accumulation_steps=4,
+            learning_rate=2e-5,
+            num_train_epochs=3,
+            save_strategy="epoch",
+        )
+
+        # Initialize trainer
+        trainer = SFTTrainer(
+            model=model,
+            args=training_args,
+            train_dataset=dataset["train"],
+            tokenizer=tokenizer,
+            formatting_func=lambda example: example,
+        )
+
+        # Train the model
+        trainer.train()
+
+        # Save the fine-tuned model
+        trainer.save_model("./fine-tuned-bangabandhu-chat-model")
+        ```
+        EOF
+        fi
+    
+    - name: Build and publish documentation
+      run: |
+        mkdocs build
+        
+    - name: Deploy to GitHub Pages
+      uses: peaceiris/actions-gh-pages@v3
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: ./site
